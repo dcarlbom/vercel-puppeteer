@@ -1,83 +1,39 @@
-import puppeteer from 'puppeteer-core';
-import chromium from '@sparticuz/chromium';
+import { NextResponse } from "next/server";
+import chromium from "@sparticuz/chromium-min";
+import puppeteer from "puppeteer-core";
 
-export const runtime = 'nodejs';
+// Using the public chromium pack URL
+const chromiumPack = "https://github.com/Sparticuz/chromium/releases/download/v121.0.0/chromium-v121.0.0-pack.tar";
+
+export const maxDuration = 300; // 5 minutes timeout
 
 export async function POST(request) {
   try {
     const { url } = await request.json();
 
     if (!url) {
-      return new Response(JSON.stringify({ error: 'URL is required' }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' },
-      });
+      return NextResponse.json({ error: 'URL is required' }, { status: 400 });
     }
 
-    let browser;
-    
-    if (process.env.NODE_ENV === 'development') {
-      browser = await puppeteer.launch({
-        headless: "new",
-        executablePath: process.env.CHROME_EXECUTABLE_PATH,
-      });
-    } else {
-      // Configure chromium for Vercel
-      chromium.setHeadlessMode = true;
-      chromium.setGraphicsMode = false;
-      
-      browser = await puppeteer.launch({
-        args: [
-          ...chromium.args,
-          '--no-sandbox',
-          '--disable-setuid-sandbox',
-          '--disable-gpu',
-          '--disable-dev-shm-usage',
-          '--single-process',
-        ],
-        defaultViewport: chromium.defaultViewport,
-        executablePath: await chromium.executablePath(),
-        headless: true,
-        ignoreHTTPSErrors: true,
-      });
-    }
+    const browser = await puppeteer.launch({
+      args: chromium.args,
+      executablePath: process.env.NODE_ENV === 'development' 
+        ? process.env.CHROME_EXECUTABLE_PATH 
+        : await chromium.executablePath(chromiumPack),
+      headless: true,
+    });
 
     const page = await browser.newPage();
-    await page.setDefaultNavigationTimeout(30000);
-    
-    try {
-      await page.goto(url, {
-        waitUntil: 'networkidle0',
-        timeout: 30000,
-      });
-      
-      const title = await page.title();
-      await browser.close();
+    await page.goto(url, { waitUntil: "networkidle0" });
+    const title = await page.evaluate(() => document.title);
+    await browser.close();
 
-      if (!title) {
-        return new Response(JSON.stringify({ title: 'No title found' }), {
-          status: 200,
-          headers: { 'Content-Type': 'application/json' },
-        });
-      }
-
-      return new Response(JSON.stringify({ title }), {
-        status: 200,
-        headers: { 'Content-Type': 'application/json' },
-      });
-    } catch (pageError) {
-      await browser.close();
-      throw pageError;
-    }
-
+    return NextResponse.json({ title });
   } catch (error) {
-    console.error('Error details:', error);
-    return new Response(JSON.stringify({ 
-      error: 'Failed to fetch title',
-      details: error.message 
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    console.error('Error:', error);
+    return NextResponse.json(
+      { error: 'Failed to fetch title', details: error.message },
+      { status: 500 }
+    );
   }
 } 
