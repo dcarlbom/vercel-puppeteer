@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+    serverExternalPackages: ['puppeteer-core'],
     webpack: (config, { isServer }) => {
       // Ignore source map files from chrome-aws-lambda
       config.module.rules.push({
@@ -9,6 +10,6 @@ const nextConfig = {
   
       return config;
     },
-  }
+}
   
 export default nextConfig
