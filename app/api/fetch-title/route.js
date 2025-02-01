@@ -22,14 +22,21 @@ export async function POST(request) {
         executablePath: process.env.CHROME_EXECUTABLE_PATH,
       });
     } else {
-      const executablePath = await chromium.executablePath(
-        "https://github.com/Sparticuz/chromium/releases/download/v121.0.0/chromium-v121.0.0-pack.tar"
-      );
-
+      // Configure chromium for Vercel
+      chromium.setHeadlessMode = true;
+      chromium.setGraphicsMode = false;
+      
       browser = await puppeteer.launch({
-        args: chromium.args,
+        args: [
+          ...chromium.args,
+          '--no-sandbox',
+          '--disable-setuid-sandbox',
+          '--disable-gpu',
+          '--disable-dev-shm-usage',
+          '--single-process',
+        ],
         defaultViewport: chromium.defaultViewport,
-        executablePath,
+        executablePath: await chromium.executablePath(),
         headless: true,
         ignoreHTTPSErrors: true,
       });
@@ -38,25 +45,31 @@ export async function POST(request) {
     const page = await browser.newPage();
     await page.setDefaultNavigationTimeout(30000);
     
-    await page.goto(url, {
-      waitUntil: 'networkidle0',
-      timeout: 30000,
-    });
-    
-    const title = await page.title();
-    await browser.close();
+    try {
+      await page.goto(url, {
+        waitUntil: 'networkidle0',
+        timeout: 30000,
+      });
+      
+      const title = await page.title();
+      await browser.close();
 
-    if (!title) {
-      return new Response(JSON.stringify({ title: 'No title found' }), {
+      if (!title) {
+        return new Response(JSON.stringify({ title: 'No title found' }), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        });
+      }
+
+      return new Response(JSON.stringify({ title }), {
         status: 200,
         headers: { 'Content-Type': 'application/json' },
       });
+    } catch (pageError) {
+      await browser.close();
+      throw pageError;
     }
 
-    return new Response(JSON.stringify({ title }), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' },
-    });
   } catch (error) {
     console.error('Error details:', error);
     return new Response(JSON.stringify({ 
