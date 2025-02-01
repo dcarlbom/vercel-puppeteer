@@ -1,11 +1,16 @@
 'use client'
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function Home() {
+  const [mounted, setMounted] = useState(false);
   const [url, setUrl] = useState('');
   const [title, setTitle] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const fetchTitle = async () => {
     try {
@@ -32,6 +37,10 @@ export default function Home() {
       setLoading(false);
     }
   };
+
+  if (!mounted) {
+    return null;
+  }
 
   return (
     <main className="min-h-screen bg-white">
