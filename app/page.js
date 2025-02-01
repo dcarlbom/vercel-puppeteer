@@ -8,12 +8,18 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Ensure component is mounted before rendering
   useEffect(() => {
+    console.log('Component mounting...');
     setMounted(true);
   }, []);
 
+  // Add this new useEffect for debugging
+  useEffect(() => {
+    console.log('Mounted state:', mounted);
+  }, [mounted]);
+
   const fetchTitle = async () => {
+    console.log('Attempting to fetch title...');
     try {
       setError(null);
       setLoading(true);
@@ -30,6 +36,7 @@ export default function Home() {
       }
       
       const data = await response.json();
+      console.log('Received data:', data);
       setTitle(data.title);
     } catch (err) {
       console.error('Error:', err);
@@ -40,9 +47,16 @@ export default function Home() {
     }
   };
 
-  // Don't render until component is mounted
+  // Add an initial render log
+  console.log('Rendering component, mounted:', mounted);
+
+  // Don't return null anymore, let's render a minimal loading state
   if (!mounted) {
-    return null;
+    return (
+      <div className="h-screen w-full flex items-center justify-center">
+        <p>Loading...</p>
+      </div>
+    );
   }
 
   return (
