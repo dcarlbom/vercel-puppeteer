@@ -20,8 +20,8 @@ A simple web application that fetches webpage titles using Puppeteer. Built with
 1. Clone the repository:
 
 ```bash
-git clone <your-repo-url>
-cd <your-repo-name>
+git clone https://github.com/dcarlbom/vercel-puppeteer.git
+cd vercel-puppeteer
 ```
 
 2. Install dependencies:
