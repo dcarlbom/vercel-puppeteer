@@ -1,4 +1,4 @@
-import puppeteer from 'puppeteer';
+import puppeteer from 'puppeteer-core';
 import chromium from '@sparticuz/chromium';
 
 export const runtime = 'nodejs';
@@ -24,24 +24,21 @@ export async function POST(request) {
         executablePath: process.env.CHROME_EXECUTABLE_PATH,
       });
     } else {
-      // Production (Vercel) - use chromium
-      chromium.setGraphicsMode = false;
+      const executablePath = await chromium.executablePath(
+        "https://github.com/Sparticuz/chromium/releases/download/v132.0.0/chromium-v132.0.0-pack.tar"
+      );
+
       browser = await puppeteer.launch({
-        args: [
-          ...chromium.args,
-          '--no-sandbox',
-          '--disable-setuid-sandbox',
-          '--disable-gpu',
-          '--disable-dev-shm-usage',
-        ],
+        args: chromium.args,
         defaultViewport: chromium.defaultViewport,
-        executablePath: await chromium.executablePath('/tmp/chromium'),
-        headless: true,
+        executablePath,
+        headless: chromium.headless,
+        ignoreHTTPSErrors: true,
       });
     }
 
     const page = await browser.newPage();
-    await page.setDefaultNavigationTimeout(15000);
+    await page.setDefaultNavigationTimeout(30000);
     
     await page.goto(url, {
       waitUntil: 'networkidle0',

@@ -11,11 +11,10 @@
   "dependencies": {
     "@sparticuz/chromium": "^132.0.0",
     "@sparticuz/chromium-min": "^132.0.0",
-    "next": "15.1.6",
-    "puppeteer": "^24.1.1",
     "puppeteer-core": "^24.1.1",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "next": "14.1.0",
+    "react": "^18",
+    "react-dom": "^18"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
