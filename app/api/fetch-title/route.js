@@ -1,5 +1,7 @@
-import puppeteer from 'puppeteer';
+import puppeteer from 'puppeteer-core';
 import chromium from '@sparticuz/chromium';
+
+export const runtime = 'nodejs';
 
 export async function POST(request) {
   try {
