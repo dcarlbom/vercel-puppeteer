@@ -39,6 +39,12 @@ CHROME_EXECUTABLE_PATH="/usr/bin/google-chrome"  # for Linux
 # CHROME_EXECUTABLE_PATH="C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"  # for Windows 
 ```
 
+Also make sure to add the following to the Vercel environment variables:
+
+```bash
+PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=1
+```
+
 4. Run the development server:
 
 ```bash
