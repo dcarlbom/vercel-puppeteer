@@ -16,23 +16,21 @@ export async function POST(request) {
 
     let browser;
     
-    // Check if we're in development or production
     if (process.env.NODE_ENV === 'development') {
-      // Local development - use local Chrome
       browser = await puppeteer.launch({
         headless: "new",
         executablePath: process.env.CHROME_EXECUTABLE_PATH,
       });
     } else {
       const executablePath = await chromium.executablePath(
-        "https://github.com/Sparticuz/chromium/releases/download/v132.0.0/chromium-v132.0.0-pack.tar"
+        "https://github.com/Sparticuz/chromium/releases/download/v121.0.0/chromium-v121.0.0-pack.tar"
       );
 
       browser = await puppeteer.launch({
         args: chromium.args,
         defaultViewport: chromium.defaultViewport,
         executablePath,
-        headless: chromium.headless,
+        headless: true,
         ignoreHTTPSErrors: true,
       });
     }
