@@ -30,9 +30,8 @@ export async function POST(request) {
 
     return NextResponse.json({ title });
   } catch (error) {
-    console.error('Error:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch title', details: error.message },
+      { error: 'Failed to fetch title' },
       { status: 500 }
     );
   }

@@ -1,25 +1,13 @@
 'use client'
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 export default function Home() {
-  const [mounted, setMounted] = useState(false);
   const [url, setUrl] = useState('');
   const [title, setTitle] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    console.log('Component mounting...');
-    setMounted(true);
-  }, []);
-
-  // Add this new useEffect for debugging
-  useEffect(() => {
-    console.log('Mounted state:', mounted);
-  }, [mounted]);
-
   const fetchTitle = async () => {
-    console.log('Attempting to fetch title...');
     try {
       setError(null);
       setLoading(true);
@@ -36,28 +24,14 @@ export default function Home() {
       }
       
       const data = await response.json();
-      console.log('Received data:', data);
       setTitle(data.title);
     } catch (err) {
-      console.error('Error:', err);
       setError(err.message || 'Error fetching title');
       setTitle('');
     } finally {
       setLoading(false);
     }
   };
-
-  // Add an initial render log
-  console.log('Rendering component, mounted:', mounted);
-
-  // Don't return null anymore, let's render a minimal loading state
-  if (!mounted) {
-    return (
-      <div className="h-screen w-full flex items-center justify-center">
-        <p>Loading...</p>
-      </div>
-    );
-  }
 
   return (
     <main className="min-h-screen bg-white">
